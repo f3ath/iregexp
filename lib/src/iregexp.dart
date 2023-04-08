@@ -7,11 +7,8 @@ import 'package:petitparser/petitparser.dart';
 class IRegexp {
   /// Creates an instance from a string. The [pattern] is parsed once, and
   /// the instance may be used many times after that.
-  IRegexp(this.pattern) {
-    if (!isValid(pattern)) {
-      throw FormatException('Invalid IRegexp "$pattern"');
-    }
-  }
+  IRegexp(this.pattern)
+      : _regex = IRegexpGrammarDefinition.parser.parse(pattern).value;
 
   /// Returns true if the [pattern] is valid.
   static isValid(String pattern) =>
@@ -20,9 +17,14 @@ class IRegexp {
   /// The pattern used to create this instance.
   final String pattern;
 
+  /// The regular expression generated from the pattern.
+  final String _regex;
+
   /// Returns a [RegExp] which matches the same strings as this [pattern].
-  RegExp toRegExp() => RegExp('^$pattern\$', unicode: true);
+  RegExp toRegExp() => _regExp('^$_regex\$');
 
   /// Returns a [RegExp] which matches any substrings matched by [pattern].
-  RegExp toSubstringRegExp() => RegExp(pattern, unicode: true);
+  RegExp toSubstringRegExp() => _regExp(_regex);
+
+  RegExp _regExp(String expression) => RegExp(expression, unicode: true);
 }

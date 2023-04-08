@@ -1,5 +1,13 @@
+## [0.0.2] - 2023-04-07
+### Changed
+- API change
+
+### Fixed
+- The dot matcher was processed incorrectly
+
 ## [0.0.1] - 2023-04-05
 ### Added
 - Initial release
 
+[0.0.2]: https://github.com/f3ath/iregexp/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/f3ath/iregexp/releases/tag/0.0.1

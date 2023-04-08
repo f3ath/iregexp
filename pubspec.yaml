@@ -1,6 +1,6 @@
 name: iregexp
 description: "A Dart library for I-Regexp: An Interoperable Regexp Format"
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/f3ath/iregexp
 
 environment:
