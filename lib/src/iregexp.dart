@@ -10,10 +10,6 @@ class IRegexp {
   IRegexp(this.pattern)
       : _regex = IRegexpGrammarDefinition.parser.parse(pattern).value;
 
-  /// Returns true if the [pattern] is valid.
-  static isValid(String pattern) =>
-      IRegexpGrammarDefinition.parser.accept(pattern);
-
   /// The pattern used to create this instance.
   final String pattern;
 
