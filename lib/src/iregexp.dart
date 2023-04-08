@@ -1,5 +1,4 @@
 import 'package:iregexp/src/iregexp_grammar_definition.dart';
-import 'package:petitparser/petitparser.dart';
 
 /// A parsed IRegexp expression which can be applied to a string.
 /// This class implements the draft-ietf-jsonpath-iregexp-04 specification.
