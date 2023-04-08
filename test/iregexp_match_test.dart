@@ -2,6 +2,13 @@ import 'package:iregexp/iregexp.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('"." should match \\u2028 and \\u2029', () {
+    final regex = RegExp(r'a[^\r\n]b');
+    expect(regex.hasMatch('axb'), isTrue);
+    expect(regex.hasMatch('a\u2028b'), isTrue);
+    expect(regex.hasMatch('a\u2029b'), isTrue);
+  });
+
   group('match successful', () {
     final testData = [
       [r'[0-9\.]+', '123', 'match digits and dots'],
