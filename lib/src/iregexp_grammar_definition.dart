@@ -20,8 +20,7 @@ class IRegexpGrammarDefinition extends GrammarDefinition {
   Parser branch() => piece().star().join();
 
   // piece = atom [ quantifier ]
-  Parser<String> piece() =>
-      (atom() & quantifier().optional().flatten()).join();
+  Parser<String> piece() => (atom() & quantifier().optional().flatten()).join();
 
   // quantifier = ( %x2A-2B ; '*'-'+'
   //  / "?" ) / ( "{" quantity "}" )
