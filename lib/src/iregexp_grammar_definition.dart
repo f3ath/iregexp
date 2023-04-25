@@ -1,20 +1,14 @@
 import 'package:petitparser/petitparser.dart';
 
-class IRegexpGrammarDefinition extends GrammarDefinition {
-  static final parser = IRegexpGrammarDefinition().build();
+class IRegexpGrammarDefinition extends GrammarDefinition<String> {
+  static final Parser<String> parser = IRegexpGrammarDefinition().build();
 
   @override
   Parser<String> start() => iregexp().end();
 
-  final surrogatePairs = seq2(
-    // Surrogate pairs
-    pattern('\uD800-\uDBFF'),
-    pattern('\uDC00-\uDFFF'),
-  ).flatten();
-
   // i-regexp = branch *( "|" branch )
   Parser<String> iregexp() =>
-      (branch() & (char('|') & branch()).join().star().join()).join();
+      (branch() & (char('|') & branch()).flatten().star()).flatten();
 
   // branch = *piece
   Parser branch() => piece().star().join();
@@ -33,19 +27,22 @@ class IRegexpGrammarDefinition extends GrammarDefinition {
   // QuantExact = 1*%x30-39 ; '0'-'9'
   final quantExact = digit().plus().flatten();
 
+  final surrogatePairs = seq2(
+    // Surrogate pairs
+    pattern('\uD800-\uDBFF'),
+    pattern('\uDC00-\uDFFF'),
+  ).flatten();
+
   // atom = NormalChar / charClass / ( "(" i-regexp ")" )
-  Parser<String> atom() => [
-        ref0(normalChar),
-        charClass(),
-        (char('(') & ref0(iregexp) & char(')')).flatten()
-      ].toChoiceParser();
+  Parser atom() =>
+      normalChar() | charClass() | (char('(') & ref0(iregexp) & char(')'));
 
   // NormalChar = ( %x00-27 / %x2C-2D ; ','-'-'
   //  / %x2F-3E ; '/'-'>'
   //  / %x40-5A ; '@'-'Z'
   //  / %x5E-7A ; '^'-'z'
   //  / %x7E-10FFFF )
-  Parser<String> normalChar() => [
+  Parser normalChar() => [
         range('\x00', '\x27'),
         range('\x2C', '\x2D'),
         range('\x2F', '\x3E'),
@@ -58,10 +55,13 @@ class IRegexpGrammarDefinition extends GrammarDefinition {
 
   // charClass = "." / SingleCharEsc / charClassEsc / charClassExpr
   Parser<String> charClass() => [
-        char('.').map((_) => r'[^\r\n]'), // dot is different in iregexp
-        singleCharEsc.flatten(),
-        charClassEsc().flatten(),
-        charClassExpr().flatten()
+        char('.').map((_) {
+          print(_);
+          return r'[^\r\n]';
+        }),
+        singleCharEsc,
+        charClassEsc(),
+        charClassExpr()
       ].toChoiceParser();
 
   // SingleCharEsc = "\" ( %x28-2B ; '('-'+'
@@ -69,83 +69,94 @@ class IRegexpGrammarDefinition extends GrammarDefinition {
   //  / "?" / %x5B-5E ; '['-'^'
   //  / %s"n" / %s"r" / %s"t" / %x7B-7D ; '{'-'}'
   //  )
-  final singleCharEsc = char(r'\') &
-      (range('\x28', '\x2B') |
-          range('\x2D', '\x2E') |
-          char('?') |
-          range('\x5B', '\x5E') |
-          char('n') |
-          char('r') |
-          char('t') |
-          range('\x7B', '\x7D'));
+  final singleCharEsc = (char(r'\') &
+          (range('(', '+') |
+              range('-', '.') |
+              char('?') |
+              range('[', '^') |
+              char('n') |
+              char('r') |
+              char('t') |
+              range('{', '}')))
+      .flatten();
 
   // charClassEsc = catEsc / complEsc
-  Parser charClassEsc() => catEsc() | complEsc();
+  Parser<String> charClassEsc() => [catEsc(), complEsc()].toChoiceParser();
 
   // charClassExpr = "[" [ "^" ] ( "-" / CCE1 ) *CCE1 [ "-" ] "]"
-  Parser charClassExpr() =>
-      char('[') &
-      char('^').optional() &
-      (char('-') | cce1()).star() &
-      char('-').optional() &
-      char(']');
+  Parser<String> charClassExpr() => [
+        char('['),
+        char('^').optional().flatten(),
+        (char('-') | cce1()).star().flatten(),
+        char('-').optional().flatten(),
+        char(']')
+      ].toSequenceParser().flatten();
 
   // CCE1 = ( CCchar [ "-" CCchar ] ) / charClassEsc
-  Parser cce1() =>
-      (ccchar() & (char('-') & ccchar()).optional()) | charClassEsc();
+  Parser<String> cce1() => [
+        seq2(ccchar(), seq2(char('-'), ccchar()).flatten().optional())
+            .flatten(),
+        charClassEsc()
+      ].toChoiceParser();
 
   // CCchar = ( %x00-2C / %x2E-5A ; '.'-'Z'
   //  / %x5E-10FFFF ) / SingleCharEsc
-  Parser ccchar() =>
-      range('\x00', '\x2C') |
-      range('\x2E', '\x5A') |
-      range('\x5E', '\xFF') |
-      range('\u{100}', '\u{FFFF}') |
-      seq2(
-        // Surrogate pairs
-        pattern('\uD800-\uDBFF'),
-        pattern('\uDC00-\uDFFF'),
-      ).flatten() |
-      singleCharEsc;
+  Parser<String> ccchar() => [
+        range('\x00', '\x2C'),
+        range('\x2E', '\x5A'),
+        range('\x5E', '\xFF'),
+        range('\u{100}', '\u{FFFF}'),
+        surrogatePairs,
+        singleCharEsc
+      ].toChoiceParser();
 
   // catEsc = %s"\p{" charProp "}"
-  Parser catEsc() => string(r'\p{') & charProp() & char('}');
+  Parser<String> catEsc() =>
+      (string(r'\p{') & charProp() & char('}')).flatten();
 
   // complEsc = %s"\P{" charProp "}"
-  Parser complEsc() => string(r'\P{') & charProp() & char('}');
+  Parser<String> complEsc() =>
+      (string(r'\P{') & charProp() & char('}')).flatten();
 
   // charProp = IsCategory
-  Parser charProp() => isCategory().flatten();
+  Parser<String> charProp() => isCategory();
 
   // IsCategory = Letters / Marks / Numbers / Punctuation / Separators /
   //     Symbols / Others
-  Parser isCategory() =>
-      letters | marks | numbers | punctuation | separators | symbols | others;
+  Parser<String> isCategory() => [
+        letters,
+        marks,
+        numbers,
+        punctuation,
+        separators,
+        symbols,
+        others
+      ].toChoiceParser();
 
   // Letters = %s"L" [ ( %x6C-6D ; 'l'-'m'
   //  / %s"o" / %x74-75 ; 't'-'u'
   //  ) ]
-  final letters = char('L') & anyOf('lmotu').optional();
+  final letters = (char('L') & anyOf('lmotu').optional()).flatten();
 
   // Marks = %s"M" [ ( %s"c" / %s"e" / %s"n" ) ]
-  final marks = char('M') & anyOf('cen').optional();
+  final marks = (char('M') & anyOf('cen').optional()).flatten();
 
   // Numbers = %s"N" [ ( %s"d" / %s"l" / %s"o" ) ]
-  final numbers = char('N') & anyOf('dlo').optional();
+  final numbers = (char('N') & anyOf('dlo').optional()).flatten();
 
   // Punctuation = %s"P" [ ( %x63-66 ; 'c'-'f'
   //  / %s"i" / %s"o" / %s"s" ) ]
-  final punctuation = char('P') & anyOf('cdefios').optional();
+  final punctuation = (char('P') & pattern('c-fios').optional()).flatten();
 
   // Separators = %s"Z" [ ( %s"l" / %s"p" / %s"s" ) ]
-  final separators = char('Z') & anyOf('lps').optional();
+  final separators = (char('Z') & anyOf('lps').optional()).flatten();
 
   // Symbols = %s"S" [ ( %s"c" / %s"k" / %s"m" / %s"o" ) ]
-  final symbols = char('S') & anyOf('ckmo').optional();
+  final symbols = (char('S') & anyOf('ckmo').optional()).flatten();
 
   // Others = %s"C" [ ( %s"c" / %s"f" / %x6E-6F ; 'n'-'o'
   //  ) ]
-  final others = char('C') & anyOf('cfno').optional();
+  final others = (char('C') & anyOf('cfno').optional()).flatten();
 }
 
 extension _ParserExtensions on Parser<List> {

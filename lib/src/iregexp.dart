@@ -7,19 +7,24 @@ class IRegexp {
   /// Creates an instance from a string. The [pattern] is parsed once, and
   /// the instance may be used many times after that.
   IRegexp(this.pattern)
-      : _regex = IRegexpGrammarDefinition.parser.parse(pattern).value;
+      : regexp = IRegexpGrammarDefinition.parser.parse(pattern).value;
+
+  /// Returns true if the [pattern] is valid.
+  static isValid(String pattern) =>
+      IRegexpGrammarDefinition.parser.accept(pattern);
 
   /// The pattern used to create this instance.
   final String pattern;
 
-  /// The regular expression generated from the pattern.
-  final String _regex;
+  /// The pattern converted to a RegExp-compatible expression.
+  final String regexp;
 
   /// Returns a [RegExp] which matches the same strings as this [pattern].
-  RegExp toRegExp() => _regExp('^$_regex\$');
+  RegExp toRegExp() => _regExp('^$regexp\$');
 
   /// Returns a [RegExp] which matches any substrings matched by [pattern].
-  RegExp toSubstringRegExp() => _regExp(_regex);
+  RegExp toSubstringRegExp() => _regExp(regexp);
 
-  RegExp _regExp(String expression) => RegExp(expression, unicode: true);
+  RegExp _regExp(String pattern) =>
+      RegExp(pattern, unicode: true, multiLine: true);
 }
