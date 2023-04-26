@@ -167,7 +167,3 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   // Others = %s"C" [ ( %s"c" / %s"f" / %x6E-6F ; 'n'-'o' ) ]
   final others = (char('C') & anyOf('cfno').optional()).flatten();
 }
-
-extension _ParserExtensions on Parser<List> {
-  Parser<String> join() => map((list) => list.join());
-}
