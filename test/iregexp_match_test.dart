@@ -1,18 +1,7 @@
 import 'package:iregexp/iregexp.dart';
-import 'package:iregexp/src/iregexp_grammar_definition.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('wtf', () {
-    print(IRegexpGrammarDefinition.parser.parse(r'a.b').value);
-
-
-    print(IRegexp(r'a.b').regexp);
-    final regex = RegExp(r'a[^\r\n]b');
-    print(regex.hasMatch('axb'));
-    print(regex.hasMatch('a\u2028b'));
-    print(regex.hasMatch('a\u2029b'));
-  });
   group('match successful', () {
     final testData = [
       [r'[0-9\.]+', '123', 'match digits and dots'],
@@ -87,8 +76,8 @@ void main() {
     ];
     for (final data in testData) {
       test(data[2], () {
-        expect(IRegexp(data[0]).toRegExp().hasMatch(data[1]), isTrue);
-        expect(IRegexp(data[0]).toSubstringRegExp().hasMatch(data[1]), isTrue);
+        expect(IRegexp(data[0]).matches(data[1]), isTrue);
+        expect(IRegexp(data[0]).matchesSubstring(data[1]), isTrue);
       });
     }
   });
@@ -164,7 +153,7 @@ void main() {
     ];
     for (final data in testData) {
       test(data[2], () {
-        expect(IRegexp(data[0]).toRegExp().hasMatch(data[1]), isFalse);
+        expect(IRegexp(data[0]).matches(data[1]), isFalse);
       });
     }
   });

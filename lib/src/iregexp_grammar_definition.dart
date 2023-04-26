@@ -1,3 +1,4 @@
+import 'package:iregexp/src/ext.dart';
 import 'package:petitparser/petitparser.dart';
 
 class IRegexpGrammarDefinition extends GrammarDefinition<String> {
@@ -7,25 +8,32 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   Parser<String> start() => iregexp().end();
 
   // i-regexp = branch *( "|" branch )
-  Parser<String> iregexp() =>
-      (branch() & (char('|') & branch()).flatten().star()).flatten();
+  Parser<String> iregexp() => [
+        branch(),
+        [char('|'), branch()].joined().star().joined()
+      ].joined();
 
   // branch = *piece
-  Parser branch() => piece().star().join();
+  Parser<String> branch() => piece().star().joined();
 
   // piece = atom [ quantifier ]
-  Parser<String> piece() => (atom() & quantifier().optional().flatten()).join();
+  Parser<String> piece() => [atom(), quantifier().optional()].joined();
 
   // quantifier = ( %x2A-2B ; '*'-'+'
   //  / "?" ) / ( "{" quantity "}" )
-  Parser quantifier() => anyOf('*+?') | (char('{') & quantity() & char('}'));
+  Parser<String> quantifier() => [
+        anyOf('*+?'),
+        [char('{'), quantity(), char('}')].joined()
+      ].toChoiceParser();
 
   // quantity = QuantExact [ "," [ QuantExact ] ]
-  Parser quantity() =>
-      quantExact & (char(',') & quantExact.optional()).optional();
+  Parser<String> quantity() => [
+        quantExact,
+        [char(','), quantExact.optional()].joined().optional()
+      ].joined();
 
   // QuantExact = 1*%x30-39 ; '0'-'9'
-  final quantExact = digit().plus().flatten();
+  final quantExact = digit().plus().joined();
 
   final surrogatePairs = seq2(
     // Surrogate pairs
@@ -33,16 +41,22 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
     pattern('\uDC00-\uDFFF'),
   ).flatten();
 
+  Parser<String> parens() =>
+      [char('('), ref0(iregexp), char(')')].toSequenceParser().joined();
+
   // atom = NormalChar / charClass / ( "(" i-regexp ")" )
-  Parser atom() =>
-      normalChar() | charClass() | (char('(') & ref0(iregexp) & char(')'));
+  Parser<String> atom() => [
+        normalChar(),
+        charClass(),
+        parens(),
+      ].toChoiceParser();
 
   // NormalChar = ( %x00-27 / %x2C-2D ; ','-'-'
   //  / %x2F-3E ; '/'-'>'
   //  / %x40-5A ; '@'-'Z'
   //  / %x5E-7A ; '^'-'z'
   //  / %x7E-10FFFF )
-  Parser normalChar() => [
+  Parser<String> normalChar() => [
         range('\x00', '\x27'),
         range('\x2C', '\x2D'),
         range('\x2F', '\x3E'),
@@ -53,12 +67,12 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
         surrogatePairs
       ].toChoiceParser();
 
+  // See https://datatracker.ietf.org/doc/html/draft-ietf-jsonpath-iregexp-04#section-5.3
+  final dot = char('.').map((_) => r'[^\r\n]');
+
   // charClass = "." / SingleCharEsc / charClassEsc / charClassExpr
   Parser<String> charClass() => [
-        char('.').map((_) {
-          print(_);
-          return r'[^\r\n]';
-        }),
+        dot,
         singleCharEsc,
         charClassEsc(),
         charClassExpr()
@@ -154,8 +168,7 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   // Symbols = %s"S" [ ( %s"c" / %s"k" / %s"m" / %s"o" ) ]
   final symbols = (char('S') & anyOf('ckmo').optional()).flatten();
 
-  // Others = %s"C" [ ( %s"c" / %s"f" / %x6E-6F ; 'n'-'o'
-  //  ) ]
+  // Others = %s"C" [ ( %s"c" / %s"f" / %x6E-6F ; 'n'-'o' ) ]
   final others = (char('C') & anyOf('cfno').optional()).flatten();
 }
 

@@ -9,22 +9,26 @@ class IRegexp {
   IRegexp(this.pattern)
       : regexp = IRegexpGrammarDefinition.parser.parse(pattern).value;
 
-  /// Returns true if the [pattern] is valid.
-  static isValid(String pattern) =>
-      IRegexpGrammarDefinition.parser.accept(pattern);
-
   /// The pattern used to create this instance.
   final String pattern;
 
   /// The pattern converted to a RegExp-compatible expression.
   final String regexp;
 
+  RegExp? _regExpCached, _substringRegExpCached;
+
   /// Returns a [RegExp] which matches the same strings as this [pattern].
-  RegExp toRegExp() => _regExp('^$regexp\$');
+  RegExp toRegExp() => _regExpCached ?? (_regExpCached = _regExp('^$regexp\$'));
 
   /// Returns a [RegExp] which matches any substrings matched by [pattern].
-  RegExp toSubstringRegExp() => _regExp(regexp);
+  RegExp toSubstringRegExp() =>
+      _substringRegExpCached ?? (_substringRegExpCached = _regExp(regexp));
 
-  RegExp _regExp(String pattern) =>
-      RegExp(pattern, unicode: true, multiLine: true);
+  /// Checks whether this [pattern] matches the [input].
+  bool matches(String input) => toRegExp().hasMatch(input);
+
+  /// Checks whether this [pattern] matches a substring in the [input].
+  bool matchesSubstring(String input) => toSubstringRegExp().hasMatch(input);
+
+  RegExp _regExp(String pattern) => RegExp(pattern, unicode: true);
 }
