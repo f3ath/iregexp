@@ -2,18 +2,12 @@ import 'package:iregexp/iregexp.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('"." should match \\u2028 and \\u2029', () {
-    final regex = RegExp(r'a[^\r\n]b');
-    expect(regex.hasMatch('axb'), isTrue);
-    expect(regex.hasMatch('a\u2028b'), isTrue);
-    expect(regex.hasMatch('a\u2029b'), isTrue);
-  });
-
   group('match successful', () {
     final testData = [
       [r'[0-9\.]+', '123', 'match digits and dots'],
       [r'[0-9\.]+', '123.456', 'match digits and dots'],
-      [r'a+\.b+', 'aa.bbb', 'the test'],
+      [r'a.b', 'a\u2028b', 'dot matches line separator'],
+      [r'a.b', 'a\u2029b', 'dot matches paragraph separator'],
       [r'foo|bar', 'foo', 'alternation'],
       [r'[ab]{3}', 'aba', 'exact quantity'],
       [r'[ab]{3,5}', 'abab', 'min and max quantity'],
@@ -82,7 +76,8 @@ void main() {
     ];
     for (final data in testData) {
       test(data[2], () {
-        expect(IRegexp(data[0]).toRegExp().hasMatch(data[1]), isTrue);
+        expect(IRegexp(data[0]).matches(data[1]), isTrue);
+        expect(IRegexp(data[0]).matchesSubstring(data[1]), isTrue);
       });
     }
   });
@@ -158,7 +153,7 @@ void main() {
     ];
     for (final data in testData) {
       test(data[2], () {
-        expect(IRegexp(data[0]).toRegExp().hasMatch(data[1]), isFalse);
+        expect(IRegexp(data[0]).matches(data[1]), isFalse);
       });
     }
   });

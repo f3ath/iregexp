@@ -7,19 +7,29 @@ class IRegexp {
   /// Creates an instance from a string. The [pattern] is parsed once, and
   /// the instance may be used many times after that.
   IRegexp(this.pattern)
-      : _regex = IRegexpGrammarDefinition.parser.parse(pattern).value;
+      : _regexp = IRegexpGrammarDefinition.parser.parse(pattern).value;
 
   /// The pattern used to create this instance.
   final String pattern;
 
-  /// The regular expression generated from the pattern.
-  final String _regex;
+  /// The pattern converted to a RegExp-compatible expression.
+  final String _regexp;
+
+  RegExp? _regExpCached, _substringRegExpCached;
 
   /// Returns a [RegExp] which matches the same strings as this [pattern].
-  RegExp toRegExp() => _regExp('^$_regex\$');
+  RegExp toRegExp() =>
+      _regExpCached ?? (_regExpCached = _regExp('^$_regexp\$'));
 
   /// Returns a [RegExp] which matches any substrings matched by [pattern].
-  RegExp toSubstringRegExp() => _regExp(_regex);
+  RegExp toSubstringRegExp() =>
+      _substringRegExpCached ?? (_substringRegExpCached = _regExp(_regexp));
 
-  RegExp _regExp(String expression) => RegExp(expression, unicode: true);
+  /// Checks whether this [pattern] matches the [input].
+  bool matches(String input) => toRegExp().hasMatch(input);
+
+  /// Checks whether this [pattern] matches a substring in the [input].
+  bool matchesSubstring(String input) => toSubstringRegExp().hasMatch(input);
+
+  RegExp _regExp(String pattern) => RegExp(pattern, unicode: true);
 }
