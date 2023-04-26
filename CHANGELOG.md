@@ -1,11 +1,10 @@
-## \[Unreleased\]
+## [0.1.0] - 2023-04-25
 ### Added
 - `matches()` and `matchesSubstring()` shortcuts
 
 ### Changed
 - More precise interpretation of `.`
 
-## [0.1.0] - 2023-04-25
 ## [0.0.2] - 2023-04-07
 ### Changed
 - API change
