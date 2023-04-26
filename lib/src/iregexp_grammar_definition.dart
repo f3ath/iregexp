@@ -71,12 +71,8 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   final dot = char('.').map((_) => r'[^\r\n]');
 
   // charClass = "." / SingleCharEsc / charClassEsc / charClassExpr
-  Parser<String> charClass() => [
-        dot,
-        singleCharEsc,
-        charClassEsc(),
-        charClassExpr()
-      ].toChoiceParser();
+  Parser<String> charClass() =>
+      [dot, singleCharEsc, charClassEsc(), charClassExpr()].toChoiceParser();
 
   // SingleCharEsc = "\" ( %x28-2B ; '('-'+'
   //  / %x2D-2E ; '-'-'.'

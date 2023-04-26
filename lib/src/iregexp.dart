@@ -18,7 +18,8 @@ class IRegexp {
   RegExp? _regExpCached, _substringRegExpCached;
 
   /// Returns a [RegExp] which matches the same strings as this [pattern].
-  RegExp toRegExp() => _regExpCached ?? (_regExpCached = _regExp('^$_regexp\$'));
+  RegExp toRegExp() =>
+      _regExpCached ?? (_regExpCached = _regExp('^$_regexp\$'));
 
   /// Returns a [RegExp] which matches any substrings matched by [pattern].
   RegExp toSubstringRegExp() =>
