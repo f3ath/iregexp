@@ -1,6 +1,9 @@
 # iregexp
 A Dart implementation of [I-Regexp]: An Interoperable Regexp Format
 
+This implementation is validating, that is `IRegexp(pattern)` throws a `formatException` if `pattern` does not conform to I-Regexp.
+Internally it uses the built-in `RegExp` class.
+
 ```dart
 import 'package:iregexp/iregexp.dart';
 
@@ -12,4 +15,4 @@ void main() {
 }
 ```
 
-[I-Regexp]: https://datatracker.ietf.org/doc/html/draft-ietf-jsonpath-iregexp-04
+[I-Regexp]: https://datatracker.ietf.org/doc/draft-ietf-jsonpath-iregexp/
