@@ -1,6 +1,6 @@
 ## [0.1.1] - 2023-04-28
 ### Fixed
-- Surrogate pairs were not matched with `.` due to a bug in Dart VM. Added a workaround
+- Surrogate pairs were not matched with `.` due to a [bug](https://github.com/dart-lang/sdk/issues/52182) in Dart VM. Added a workaround
 
 ## [0.1.0] - 2023-04-25
 ### Added
