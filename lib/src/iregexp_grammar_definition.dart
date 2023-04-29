@@ -68,7 +68,8 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
       ].toChoiceParser();
 
   // See https://datatracker.ietf.org/doc/html/draft-ietf-jsonpath-iregexp-04#section-5.3
-  final dot = char('.').map((_) => r'[^\r\n]');
+  // TODO: remove parenthesis when this is released https://github.com/dart-lang/sdk/issues/52182
+  final dot = char('.').map((_) => r'([^\r\n])');
 
   // charClass = "." / SingleCharEsc / charClassEsc / charClassExpr
   Parser<String> charClass() =>

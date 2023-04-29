@@ -6,6 +6,7 @@ void main() {
     final testData = [
       [r'[0-9\.]+', '123', 'match digits and dots'],
       [r'[0-9\.]+', '123.456', 'match digits and dots'],
+      [r'a.b', 'a\uD800\uDD01b', 'surrogate pairs: a\uD800\uDD01b'],
       [r'a.b', 'a\u2028b', 'dot matches line separator'],
       [r'a.b', 'a\u2029b', 'dot matches paragraph separator'],
       [r'foo|bar', 'foo', 'alternation'],
@@ -77,6 +78,8 @@ void main() {
     for (final data in testData) {
       test(data[2], () {
         expect(IRegexp(data[0]).matches(data[1]), isTrue);
+      });
+      test('${data[2]} - substring', () {
         expect(IRegexp(data[0]).matchesSubstring(data[1]), isTrue);
       });
     }
