@@ -1,5 +1,6 @@
 ## [0.1.2] - 2023-08-26
 ### Changed
+- Bump SDK to 3.0.0
 - Bump petitparser to 6.0.0
 
 ## [0.1.1] - 2023-04-28
