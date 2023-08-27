@@ -1,3 +1,7 @@
+## [0.1.2] - 2023-08-26
+### Changed
+- Bump petitparser to 6.0.0
+
 ## [0.1.1] - 2023-04-28
 ### Fixed
 - Surrogate pairs were not matched with `.` due to a bug in Dart VM. Added a workaround
@@ -20,6 +24,7 @@
 ### Added
 - Initial release
 
+[0.1.2]: https://github.com/f3ath/iregexp/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/f3ath/iregexp/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/f3ath/iregexp/compare/0.0.2...0.1.0
 [0.0.2]: https://github.com/f3ath/iregexp/compare/0.0.1...0.0.2
