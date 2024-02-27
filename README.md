@@ -1,5 +1,5 @@
 # iregexp
-A Dart implementation of [I-Regexp]: An Interoperable Regexp Format
+A Dart implementation of [RFC 9485] I-Regexp: An Interoperable Regexp Format
 
 This implementation is validating, that is `IRegexp(pattern)` throws a `formatException` if `pattern` does not conform to I-Regexp.
 Internally it uses the built-in `RegExp` class.
@@ -15,4 +15,4 @@ void main() {
 }
 ```
 
-[I-Regexp]: https://datatracker.ietf.org/doc/draft-ietf-jsonpath-iregexp/
+[RFC 9485]: https://datatracker.ietf.org/doc/rfc9485/

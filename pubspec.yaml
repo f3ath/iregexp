@@ -1,5 +1,5 @@
 name: iregexp
-description: "A Dart library for I-Regexp: An Interoperable Regexp Format"
+description: "An implementation of RFC 9485 I-Regexp: An Interoperable Regexp Format. Checks the I-Regexp for correctness, allows matching by substring or by entire string."
 version: 0.1.2
 repository: https://github.com/f3ath/iregexp
 
