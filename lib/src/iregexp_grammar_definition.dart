@@ -9,9 +9,9 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
 
   // i-regexp = branch *( "|" branch )
   Parser<String> iregexp() => [
-        branch(),
-        [char('|'), branch()].joined().star().joined()
-      ].joined();
+    branch(),
+    [char('|'), branch()].joined().star().joined(),
+  ].joined();
 
   // branch = *piece
   Parser<String> branch() => piece().star().joined();
@@ -22,15 +22,15 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   // quantifier = ( %x2A-2B ; '*'-'+'
   //  / "?" ) / ( "{" quantity "}" )
   Parser<String> quantifier() => [
-        anyOf('*+?'),
-        [char('{'), quantity(), char('}')].joined()
-      ].toChoiceParser();
+    anyOf('*+?'),
+    [char('{'), quantity(), char('}')].joined(),
+  ].toChoiceParser();
 
   // quantity = QuantExact [ "," [ QuantExact ] ]
   Parser<String> quantity() => [
-        quantExact,
-        [char(','), quantExact.optional()].joined().optional()
-      ].joined();
+    quantExact,
+    [char(','), quantExact.optional()].joined().optional(),
+  ].joined();
 
   // QuantExact = 1*%x30-39 ; '0'-'9'
   final quantExact = digit().plus().joined();
@@ -45,11 +45,8 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
       [char('('), ref0(iregexp), char(')')].toSequenceParser().joined();
 
   // atom = NormalChar / charClass / ( "(" i-regexp ")" )
-  Parser<String> atom() => [
-        normalChar(),
-        charClass(),
-        parens(),
-      ].toChoiceParser();
+  Parser<String> atom() =>
+      [normalChar(), charClass(), parens()].toChoiceParser();
 
   // NormalChar = ( %x00-27 / %x2C-2D ; ','-'-'
   //  / %x2F-3E ; '/'-'>'
@@ -57,15 +54,15 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   //  / %x5E-7A ; '^'-'z'
   //  / %x7E-10FFFF )
   Parser<String> normalChar() => [
-        range('\x00', '\x27'),
-        range('\x2C', '\x2D'),
-        range('\x2F', '\x3E'),
-        range('\x40', '\x5A'),
-        range('\x5E', '\x7A'),
-        range('\x7E', '\xFF'),
-        range('\u{100}', '\u{FFFF}'),
-        surrogatePairs
-      ].toChoiceParser();
+    range('\x00', '\x27'),
+    range('\x2C', '\x2D'),
+    range('\x2F', '\x3E'),
+    range('\x40', '\x5A'),
+    range('\x5E', '\x7A'),
+    range('\x7E', '\xFF'),
+    range('\u{100}', '\u{FFFF}'),
+    surrogatePairs,
+  ].toChoiceParser();
 
   // See https://datatracker.ietf.org/doc/html/draft-ietf-jsonpath-iregexp-04#section-5.3
   // TODO: remove parenthesis when this is released https://github.com/dart-lang/sdk/issues/52182
@@ -80,46 +77,46 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   //  / "?" / %x5B-5E ; '['-'^'
   //  / %s"n" / %s"r" / %s"t" / %x7B-7D ; '{'-'}'
   //  )
-  final singleCharEsc = (char(r'\') &
-          (range('(', '+') |
-              range('-', '.') |
-              char('?') |
-              range('[', '^') |
-              char('n') |
-              char('r') |
-              char('t') |
-              range('{', '}')))
-      .flatten();
+  final singleCharEsc =
+      (char(r'\') &
+              (range('(', '+') |
+                  range('-', '.') |
+                  char('?') |
+                  range('[', '^') |
+                  char('n') |
+                  char('r') |
+                  char('t') |
+                  range('{', '}')))
+          .flatten();
 
   // charClassEsc = catEsc / complEsc
   Parser<String> charClassEsc() => [catEsc(), complEsc()].toChoiceParser();
 
   // charClassExpr = "[" [ "^" ] ( "-" / CCE1 ) *CCE1 [ "-" ] "]"
   Parser<String> charClassExpr() => [
-        char('['),
-        char('^').optional().flatten(),
-        (char('-') | cce1()).star().flatten(),
-        char('-').optional().flatten(),
-        char(']')
-      ].toSequenceParser().flatten();
+    char('['),
+    char('^').optional().flatten(),
+    (char('-') | cce1()).star().flatten(),
+    char('-').optional().flatten(),
+    char(']'),
+  ].toSequenceParser().flatten();
 
   // CCE1 = ( CCchar [ "-" CCchar ] ) / charClassEsc
   Parser<String> cce1() => [
-        seq2(ccchar(), seq2(char('-'), ccchar()).flatten().optional())
-            .flatten(),
-        charClassEsc()
-      ].toChoiceParser();
+    seq2(ccchar(), seq2(char('-'), ccchar()).flatten().optional()).flatten(),
+    charClassEsc(),
+  ].toChoiceParser();
 
   // CCchar = ( %x00-2C / %x2E-5A ; '.'-'Z'
   //  / %x5E-10FFFF ) / SingleCharEsc
   Parser<String> ccchar() => [
-        range('\x00', '\x2C'),
-        range('\x2E', '\x5A'),
-        range('\x5E', '\xFF'),
-        range('\u{100}', '\u{FFFF}'),
-        surrogatePairs,
-        singleCharEsc
-      ].toChoiceParser();
+    range('\x00', '\x2C'),
+    range('\x2E', '\x5A'),
+    range('\x5E', '\xFF'),
+    range('\u{100}', '\u{FFFF}'),
+    surrogatePairs,
+    singleCharEsc,
+  ].toChoiceParser();
 
   // catEsc = %s"\p{" charProp "}"
   Parser<String> catEsc() =>
@@ -135,14 +132,14 @@ class IRegexpGrammarDefinition extends GrammarDefinition<String> {
   // IsCategory = Letters / Marks / Numbers / Punctuation / Separators /
   //     Symbols / Others
   Parser<String> isCategory() => [
-        letters,
-        marks,
-        numbers,
-        punctuation,
-        separators,
-        symbols,
-        others
-      ].toChoiceParser();
+    letters,
+    marks,
+    numbers,
+    punctuation,
+    separators,
+    symbols,
+    others,
+  ].toChoiceParser();
 
   // Letters = %s"L" [ ( %x6C-6D ; 'l'-'m'
   //  / %s"o" / %x74-75 ; 't'-'u'

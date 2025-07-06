@@ -1,3 +1,7 @@
+## [0.2.0] - 2025-07-06
+### Changed
+- Dependency and SDK bump
+
 ## [0.1.2] - 2023-08-26
 ### Changed
 - Bump SDK to 3.0.0
@@ -25,6 +29,7 @@
 ### Added
 - Initial release
 
+[0.2.0]: https://github.com/f3ath/iregexp/compare/0.1.2...0.2.0
 [0.1.2]: https://github.com/f3ath/iregexp/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/f3ath/iregexp/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/f3ath/iregexp/compare/0.0.2...0.1.0
