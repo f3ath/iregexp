@@ -2,7 +2,7 @@ import 'package:iregexp/iregexp.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('match successful', () {
+  group('Positive', () {
     final testData = [
       [r'[0-9\.]+', '123', 'match digits and dots'],
       [r'[0-9\.]+', '123.456', 'match digits and dots'],
@@ -76,19 +76,24 @@ void main() {
       [r'\P{Cn}', 'a', 'unicode character category other not assigned'],
     ];
     for (final data in testData) {
-      test(data[2], () {
+      final label = '${data[0]} matches ${data[1]} (${data[2]})';
+      test(label, () {
         expect(IRegexp(data[0]).matches(data[1]), isTrue);
       });
-      test('${data[2]} - substring', () {
+      test('$label as substring', () {
         expect(IRegexp(data[0]).matchesSubstring(data[1]), isTrue);
       });
     }
   });
 
-  group('match failed', () {
+  group('Negative', () {
     final testData = [
       [r'[0-9\.]+', 'abc', 'match digits and dots'],
       [r'foo|bar', 'baz', 'alternation'],
+      [r'a|b', 'ac', 'alternation'],
+      [r'a|b', 'a123', 'alternation'],
+      [r'a|b', 'cb', 'alternation'],
+      [r'a|b', '123b', 'alternation'],
       [r'[ab]{3}', 'a', 'exact quantity'],
       [r'[ab]{3,5}', 'a', 'min and max quantity'],
       [r'[^ab]', 'a', 'character class negation'],
@@ -155,7 +160,8 @@ void main() {
       [r'\P{Cn}', '\u0378', 'unicode character category other not assigned'],
     ];
     for (final data in testData) {
-      test(data[2], () {
+      final label = '${data[0]} does not match ${data[1]} (${data[2]})';
+      test(label, () {
         expect(IRegexp(data[0]).matches(data[1]), isFalse);
       });
     }
