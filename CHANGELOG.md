@@ -1,3 +1,7 @@
+## [0.2.1] - 2026-10-12
+### Fixed
+- Incorrect precedence of branching and begin/end of the line
+
 ## [0.2.0] - 2025-07-06
 ### Changed
 - Dependency and SDK bump
@@ -29,6 +33,7 @@
 ### Added
 - Initial release
 
+[0.2.1]: https://github.com/f3ath/iregexp/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/f3ath/iregexp/compare/0.1.2...0.2.0
 [0.1.2]: https://github.com/f3ath/iregexp/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/f3ath/iregexp/compare/0.1.0...0.1.1
